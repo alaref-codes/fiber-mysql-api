@@ -21,6 +21,8 @@ func setupRoutes(app *fiber.App) {
 	app.Get("/sub/:id", subs.GetOneSub)
 	app.Post("/sub", subs.CreateSub)
 	app.Delete("/sub/:id", subs.DeleteSub)
+	app.Put("/sub/", subs.UpdateSub)
+
 }
 
 func initDatabase() {

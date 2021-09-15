@@ -5,6 +5,8 @@ package subs
 
  */
 import (
+	"fmt"
+
 	"github.com/alaref-codes/subs/database"
 	"github.com/gofiber/fiber/v2"
 )
@@ -33,10 +35,11 @@ func CreateSub(c *fiber.Ctx) error {
 	db := database.DBConn
 	var sub Su
 	err := c.BodyParser(&sub)
+
 	if err != nil {
 		return err
 	}
-	result := db.Where("email = ?", sub.Id).Find(&sub)
+	result := db.Where("email = ?", sub.Email).Find(&sub)
 	if result.RowsAffected != 0 {
 		return fiber.NewError(503, "Record already exists")
 	}
@@ -60,4 +63,27 @@ func DeleteSub(c *fiber.Ctx) error {
 	result.Delete(&sub)
 
 	return c.SendString("email Deleted successfully")
+}
+
+func UpdateSub(c *fiber.Ctx) error {
+	db := database.DBConn
+	var sub Su
+	var newSub Su
+	err := c.BodyParser(&newSub)
+
+	if err != nil {
+		return err
+	}
+
+	result := db.First(&sub, newSub.Id)
+	fmt.Println(result.RowsAffected)
+
+	if result.RowsAffected == 0 {
+		return fiber.NewError(503, "Record doesn't exists")
+	}
+
+	sub.Email = newSub.Email
+	db.Save(&sub)
+
+	return c.JSON(sub)
 }
